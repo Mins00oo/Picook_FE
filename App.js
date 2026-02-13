@@ -1,20 +1,17 @@
-import { StatusBar } from 'expo-status-bar';
-import { StyleSheet, Text, View } from 'react-native';
+import React from "react";
+import { SafeAreaProvider } from "react-native-safe-area-context";
+import { StatusBar } from "expo-status-bar";
+import AppNavigator from "./src/navigation/AppNavigator";
 
 export default function App() {
   return (
-    <View style={styles.container}>
-      <Text>Open up App.js to start working on your app!</Text>
+    // 1. 안전 영역(노치 등) 처리를 위한 최상위 Provider
+    <SafeAreaProvider>
+      {/* 2. 상태바(배터리, 시간 나오는 곳) 스타일 설정 */}
       <StatusBar style="auto" />
-    </View>
+
+      {/* 3. 우리가 만든 네비게이션(앱의 본체) 연결 */}
+      <AppNavigator />
+    </SafeAreaProvider>
   );
 }
-
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: '#fff',
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-});
