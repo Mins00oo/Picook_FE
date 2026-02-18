@@ -1,4 +1,4 @@
-import React, { useEffect, useMemo, useState } from "react";
+import { useMemo, useState } from "react";
 import {
   View,
   Text,
@@ -6,58 +6,65 @@ import {
   TouchableOpacity,
   FlatList,
   TextInput,
-  Alert,
 } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { Ionicons } from "@expo/vector-icons";
+import Toast from "react-native-toast-message";
 import { colors } from "../theme/colors";
 import { INGREDIENTS, INGREDIENT_CATEGORIES } from "../mock/_data";
 import { useIngredientStore } from "../store/useIngredientStore";
+import { useDebounce } from "../hooks/useDebounce";
+import EmptyState from "../components/common/EmptyState";
 
-export default function MyFridgeScreen({ navigation }) {
+export default function MyFridgeScreen() {
   const [selectedCategory, setSelectedCategory] = useState("전체");
   const [searchText, setSearchText] = useState("");
-  const [draftIngredients, setDraftIngredients] = useState([]);
+  const debouncedSearchText = useDebounce(searchText, 300);
 
-  // 스토어에서 '내 냉장고' 상태 가져오기
-  const {
-    myFridgeIngredients,
-    setMyFridgeIngredients,
-    loadFridgeToSelection,
-  } = useIngredientStore();
-
-  useEffect(() => {
-    setDraftIngredients(myFridgeIngredients);
-  }, [myFridgeIngredients]);
+  // 스토어에서 필요한 상태/액션만 선택 구독
+  const myFridgeIngredients = useIngredientStore(
+    (state) => state.myFridgeIngredients,
+  );
+  const toggleMyFridge = useIngredientStore((state) => state.toggleMyFridge);
+  const loadFridgeToSelection = useIngredientStore(
+    (state) => state.loadFridgeToSelection,
+  );
 
   const filteredIngredients = useMemo(() => {
-    const normalizedSearchText = searchText.trim();
+    const normalizedSearchText = debouncedSearchText.trim();
     return INGREDIENTS.filter((item) => {
       const matchCategory =
         selectedCategory === "전체" || item.category === selectedCategory;
       const matchSearch = item.name.includes(normalizedSearchText);
       return matchCategory && matchSearch;
     });
-  }, [searchText, selectedCategory]);
+  }, [debouncedSearchText, selectedCategory]);
 
-  const toggleDraftIngredient = (id) => {
-    setDraftIngredients((prev) =>
-      prev.includes(id) ? prev.filter((itemId) => itemId !== id) : [...prev, id],
-    );
-  };
+  const toggleIngredientInFridge = (id) => {
+    const exists = myFridgeIngredients.includes(id);
+    const ingredientName =
+      INGREDIENTS.find((ingredient) => ingredient.id === id)?.name ?? "재료";
 
-  const handleSave = () => {
-    setMyFridgeIngredients(draftIngredients);
+    toggleMyFridge(id);
     loadFridgeToSelection();
-    Alert.alert("저장 완료", "냉장고 재료가 업데이트 되었습니다!");
+
+    Toast.show({
+      type: "success",
+      text1: exists
+        ? `${ingredientName}을(를) 냉장고에서 제거했어요`
+        : `${ingredientName}을(를) 냉장고에 추가했어요`,
+      position: "top",
+      topOffset: 70,
+      visibilityTime: 1200,
+    });
   };
 
   const renderIngredientItem = ({ item }) => {
-    const isSaved = draftIngredients.includes(item.id);
+    const isSaved = myFridgeIngredients.includes(item.id);
     return (
       <TouchableOpacity
         style={[styles.ingredientChip, isSaved && styles.ingredientChipSaved]}
-        onPress={() => toggleDraftIngredient(item.id)}
+        onPress={() => toggleIngredientInFridge(item.id)}
         activeOpacity={0.7}
       >
         <Text style={styles.ingredientIcon}>{item.icon}</Text>
@@ -77,25 +84,11 @@ export default function MyFridgeScreen({ navigation }) {
 
   return (
     <SafeAreaView style={styles.container} edges={["top"]}>
-      {/* 헤더 */}
-      <View style={styles.header}>
-        <TouchableOpacity
-          onPress={() => navigation.goBack()}
-          style={styles.backButton}
-        >
-          <Ionicons name="arrow-back" size={24} color={colors.textMain} />
-        </TouchableOpacity>
-        <Text style={styles.headerTitle}>내 냉장고 채우기</Text>
-        <TouchableOpacity onPress={handleSave}>
-          <Text style={styles.saveText}>완료</Text>
-        </TouchableOpacity>
-      </View>
-
       {/* 안내 문구 */}
       <View style={styles.infoBox}>
         <Text style={styles.infoText}>
-          💡 자주 쓰는 재료를 미리 등록해두세요.{"\n"}
-          레시피 검색 시 자동으로 선택됩니다.
+          자주 쓰는 재료를 등록해두세요.{"\n"}
+          레시피 검색 시 자동으로 포함됩니다.
         </Text>
       </View>
 
@@ -105,7 +98,7 @@ export default function MyFridgeScreen({ navigation }) {
           <Ionicons name="search" size={20} color={colors.textSub} />
           <TextInput
             style={styles.searchInput}
-            placeholder="재료 검색"
+            placeholder="검색"
             value={searchText}
             onChangeText={setSearchText}
           />
@@ -118,6 +111,7 @@ export default function MyFridgeScreen({ navigation }) {
           data={INGREDIENT_CATEGORIES}
           horizontal
           showsHorizontalScrollIndicator={false}
+          keyExtractor={(item) => item}
           renderItem={({ item }) => (
             <TouchableOpacity
               style={[
@@ -148,6 +142,13 @@ export default function MyFridgeScreen({ navigation }) {
         columnWrapperStyle={styles.gridRow}
         contentContainerStyle={styles.gridContent}
         showsVerticalScrollIndicator={false}
+        ListEmptyComponent={
+          <EmptyState
+            icon="ice-cream-outline"
+            title="해당 조건의 재료가 없어요"
+            description="검색어나 카테고리를 변경해보세요."
+          />
+        }
       />
     </SafeAreaView>
   );
@@ -155,15 +156,6 @@ export default function MyFridgeScreen({ navigation }) {
 
 const styles = StyleSheet.create({
   container: { flex: 1, backgroundColor: colors.background },
-  header: {
-    flexDirection: "row",
-    justifyContent: "space-between",
-    alignItems: "center",
-    paddingHorizontal: 20,
-    paddingBottom: 16,
-  },
-  headerTitle: { fontSize: 18, fontWeight: "bold", color: colors.textMain },
-  saveText: { fontSize: 16, fontWeight: "bold", color: colors.primary },
 
   infoBox: {
     backgroundColor: "#F0FDF4",

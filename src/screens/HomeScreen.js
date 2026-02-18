@@ -1,3 +1,4 @@
+import { useEffect, useState } from "react";
 import {
   View,
   StyleSheet,
@@ -17,6 +18,17 @@ import CategorySection from "../components/home/CategorySection";
 
 export default function HomeScreen({ navigation }) {
   const user = useAuthStore((state) => state.user);
+  const [isPopularLoading, setIsPopularLoading] = useState(true);
+
+  useEffect(() => {
+    const timerId = setTimeout(() => {
+      setIsPopularLoading(false);
+    }, 600);
+
+    return () => {
+      clearTimeout(timerId);
+    };
+  }, []);
 
   return (
     <View style={styles.container}>
@@ -30,7 +42,14 @@ export default function HomeScreen({ navigation }) {
         showsVerticalScrollIndicator={false}
         contentContainerStyle={styles.scrollContent}
       >
-        <PopularSection recipes={POPULAR_RECIPES} />
+        <PopularSection
+          recipes={POPULAR_RECIPES}
+          isLoading={isPopularLoading}
+          onPressMore={() => navigation.navigate("PopularRecipes")}
+          onPressRecipe={(recipe) =>
+            navigation.navigate("RecipeDetail", { recipeId: recipe.id })
+          }
+        />
         <CategorySection categories={CATEGORIES} />
         <TouchableOpacity
           style={styles.fab}
@@ -38,7 +57,7 @@ export default function HomeScreen({ navigation }) {
           onPress={() => navigation.navigate("IngredientSelect")}
         >
           <Ionicons name="search" size={20} color="white" />
-          <Text style={styles.fabText}>내 재료로 레시피 찾기</Text>
+          <Text style={styles.fabText}>레시피 찾기</Text>
         </TouchableOpacity>
 
         <View style={{ height: 0 }} />

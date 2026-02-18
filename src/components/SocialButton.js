@@ -1,5 +1,4 @@
-import React from "react";
-import { TouchableOpacity, Text, StyleSheet, View } from "react-native";
+import { TouchableOpacity, Text, StyleSheet } from "react-native";
 import { Ionicons } from "@expo/vector-icons"; // 아이콘 (필요시 사용)
 
 export default function SocialButton({

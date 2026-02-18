@@ -19,8 +19,6 @@ export const useAuthStore = create(
         set({ isLoading: true });
 
         try {
-          console.log(`[Auth] ${provider} 로그인 시도...`);
-
           // --- [API 연동 포인트] ---
           // const apiKey = process.env.EXPO_PUBLIC_KAKAO_APP_KEY;
           // const response = await api.post('/login', { provider });
@@ -38,16 +36,13 @@ export const useAuthStore = create(
           };
 
           set({ user: mockUser, isLoading: false });
-          console.log("[Auth] 로그인 성공:", mockUser.nickname);
         } catch (error) {
-          console.error("[Auth] 로그인 실패:", error);
           set({ isLoading: false });
         }
       },
 
       // 로그아웃 액션
       logout: () => {
-        console.log("[Auth] 로그아웃");
         set({ user: null });
       },
     }),

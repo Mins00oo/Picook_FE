@@ -32,6 +32,54 @@ export const POPULAR_RECIPES = [
     image:
       "https://images.unsplash.com/photo-1552611052-33e04de081de?w=500&auto=format&fit=crop&q=60",
   },
+  {
+    id: 5,
+    title: "된장찌개",
+    time: "30분",
+    difficulty: "중",
+    image:
+      "https://images.unsplash.com/photo-1583224964978-2f4f86b2b7a1?w=500&auto=format&fit=crop&q=60",
+  },
+  {
+    id: 6,
+    title: "오므라이스",
+    time: "20분",
+    difficulty: "하",
+    image:
+      "https://images.unsplash.com/photo-1604908177225-96b9b5fcd7f2?w=500&auto=format&fit=crop&q=60",
+  },
+  {
+    id: 7,
+    title: "불고기 덮밥",
+    time: "25분",
+    difficulty: "중",
+    image:
+      "https://images.unsplash.com/photo-1512058564366-18510be2db19?w=500&auto=format&fit=crop&q=60",
+  },
+  {
+    id: 8,
+    title: "알리오 올리오",
+    time: "18분",
+    difficulty: "하",
+    image:
+      "https://images.unsplash.com/photo-1621996346565-e3dbc646d9a9?w=500&auto=format&fit=crop&q=60",
+  },
+  {
+    id: 9,
+    title: "닭볶음탕",
+    time: "45분",
+    difficulty: "중",
+    image:
+      "https://images.unsplash.com/photo-1603360946369-dc9bb6258143?w=500&auto=format&fit=crop&q=60",
+  },
+  {
+    id: 10,
+    title: "참치마요 덮밥",
+    time: "12분",
+    difficulty: "하",
+    image:
+      "https://images.unsplash.com/photo-1544025162-d76694265947?w=500&auto=format&fit=crop&q=60",
+  },
 ];
 
 export const CATEGORIES = [

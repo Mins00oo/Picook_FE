@@ -1,4 +1,3 @@
-import React from "react";
 import { NavigationContainer } from "@react-navigation/native";
 import { createNativeStackNavigator } from "@react-navigation/native-stack";
 import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
@@ -12,6 +11,8 @@ import LoginScreen from "../screens/LoginScreen";
 import HomeScreen from "../screens/HomeScreen";
 import IngredientSelectScreen from "../screens/IngredientSelectScreen";
 import MyFridgeScreen from "../screens/MyFridgeScreen";
+import PopularRecipesScreen from "../screens/PopularRecipesScreen";
+import RecipeDetailScreen from "../screens/RecipeDetailScreen";
 
 const Stack = createNativeStackNavigator();
 const Tab = createBottomTabNavigator();
@@ -74,7 +75,16 @@ export default function AppNavigator() {
                 animation: "slide_from_right", // 오른쪽에서 들어오는 애니메이션
               }}
             />
-            <Stack.Screen name="MyFridge" component={MyFridgeScreen} />
+            <Stack.Screen
+              name="PopularRecipes"
+              component={PopularRecipesScreen}
+              options={{ headerShown: false }}
+            />
+            <Stack.Screen
+              name="RecipeDetail"
+              component={RecipeDetailScreen}
+              options={{ headerShown: false }}
+            />
           </>
         ) : (
           <Stack.Screen name="Login" component={LoginScreen} />

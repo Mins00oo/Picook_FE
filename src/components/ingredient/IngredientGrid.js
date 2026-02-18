@@ -1,7 +1,7 @@
-import React from "react";
-import { View, Text, StyleSheet, FlatList, TouchableOpacity } from "react-native";
+import { Text, StyleSheet, FlatList, TouchableOpacity } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
 import { colors } from "../../theme/colors";
+import EmptyState from "../common/EmptyState";
 
 export default function IngredientGrid({
   ingredients,
@@ -42,9 +42,11 @@ export default function IngredientGrid({
       contentContainerStyle={styles.gridContent}
       showsVerticalScrollIndicator={false}
       ListEmptyComponent={
-        <View style={styles.emptyContainer}>
-          <Text style={styles.emptyText}>검색 결과가 없어요 🥲</Text>
-        </View>
+        <EmptyState
+          icon="search"
+          title="검색 결과가 없어요"
+          description="다른 키워드나 카테고리로 다시 찾아보세요."
+        />
       }
     />
   );
@@ -75,6 +77,4 @@ const styles = StyleSheet.create({
   ingredientName: { fontSize: 14, color: colors.textMain, fontWeight: "500" },
   ingredientNameSelected: { color: colors.primary, fontWeight: "bold" },
   checkIcon: { position: "absolute", top: 8, right: 8 },
-  emptyContainer: { alignItems: "center", marginTop: 50 },
-  emptyText: { color: colors.textSub, fontSize: 16 },
 });

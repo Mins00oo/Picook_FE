@@ -1,10 +1,11 @@
-import React, { useMemo, useState } from "react";
+import { useCallback, useMemo, useState } from "react";
 import { StyleSheet } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { useFocusEffect } from "@react-navigation/native";
 import { colors } from "../theme/colors";
 import { INGREDIENTS, INGREDIENT_CATEGORIES } from "../mock/_data";
 import { useIngredientStore } from "../store/useIngredientStore";
+import { useDebounce } from "../hooks/useDebounce";
 import IngredientHeader from "../components/ingredient/IngredientHeader";
 import IngredientCategoryTabs from "../components/ingredient/IngredientCategoryTabs";
 import IngredientGrid from "../components/ingredient/IngredientGrid";
@@ -13,19 +14,27 @@ import IngredientActionBar from "../components/ingredient/IngredientActionBar";
 export default function IngredientSelectScreen({ navigation }) {
   const [selectedCategory, setSelectedCategory] = useState("전체");
   const [searchText, setSearchText] = useState("");
+  const debouncedSearchText = useDebounce(searchText, 300);
 
   // Zustand 상태
-  const { selectedIngredients, toggleIngredient, loadFridgeToSelection } =
-    useIngredientStore();
+  const selectedIngredients = useIngredientStore(
+    (state) => state.selectedIngredients,
+  );
+  const toggleIngredient = useIngredientStore(
+    (state) => state.toggleIngredient,
+  );
+  const loadFridgeToSelection = useIngredientStore(
+    (state) => state.loadFridgeToSelection,
+  );
 
   useFocusEffect(
-    React.useCallback(() => {
+    useCallback(() => {
       loadFridgeToSelection();
     }, [loadFridgeToSelection]),
   );
 
   const filteredIngredients = useMemo(() => {
-    const normalizedSearchText = searchText.trim();
+    const normalizedSearchText = debouncedSearchText.trim();
 
     return INGREDIENTS.filter((item) => {
       const matchCategory =
@@ -33,7 +42,7 @@ export default function IngredientSelectScreen({ navigation }) {
       const matchSearch = item.name.includes(normalizedSearchText);
       return matchCategory && matchSearch;
     });
-  }, [searchText, selectedCategory]);
+  }, [debouncedSearchText, selectedCategory]);
 
   // 요리 찾기 버튼 클릭
   const handleSearchRecipes = () => {

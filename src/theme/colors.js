@@ -9,6 +9,7 @@ export const colors = {
     textMain: '#191F28',   // 진한 검정 (제목)
     textSub: '#8B95A1',    // 회색 (부제목)
     textWhite: '#FFFFFF',
+    white: '#FFFFFF',
 
     // 소셜 버튼 컬러
     kakao: '#FEE500',

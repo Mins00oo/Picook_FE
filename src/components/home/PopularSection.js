@@ -8,10 +8,20 @@ import {
 } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
 import { colors } from "../../theme/colors";
+import Skeleton from "../common/Skeleton";
 
-export default function PopularSection({ recipes }) {
+export default function PopularSection({
+  recipes,
+  isLoading = false,
+  onPressMore,
+  onPressRecipe,
+}) {
   const renderItem = ({ item, index }) => (
-    <TouchableOpacity style={styles.card} activeOpacity={0.9}>
+    <TouchableOpacity
+      style={styles.card}
+      activeOpacity={0.9}
+      onPress={() => onPressRecipe?.(item)}
+    >
       <View style={styles.imageContainer}>
         <Image
           source={{ uri: item.image }}
@@ -41,14 +51,26 @@ export default function PopularSection({ recipes }) {
     <View style={styles.section}>
       <View style={styles.sectionHeader}>
         <Text style={styles.sectionTitle}>🔥 이달의 인기 요리</Text>
-        <TouchableOpacity>
+        <TouchableOpacity onPress={onPressMore}>
           <Text style={styles.moreText}>전체보기</Text>
         </TouchableOpacity>
       </View>
 
       <FlatList
-        data={recipes}
-        renderItem={renderItem}
+        data={isLoading ? [{ id: "skeleton-1" }, { id: "skeleton-2" }] : recipes}
+        renderItem={
+          isLoading
+            ? () => (
+                <View style={styles.skeletonCard}>
+                  <Skeleton width="100%" height={120} style={styles.skeletonImage} />
+                  <View style={styles.skeletonTextBox}>
+                    <Skeleton width="75%" height={16} />
+                    <Skeleton width="50%" height={12} style={{ marginTop: 10 }} />
+                  </View>
+                </View>
+              )
+            : renderItem
+        }
         keyExtractor={(item) => item.id.toString()}
         horizontal
         showsHorizontalScrollIndicator={false}
@@ -70,6 +92,20 @@ const styles = StyleSheet.create({
   sectionTitle: { fontSize: 20, fontWeight: "700", color: colors.textMain },
   moreText: { fontSize: 13, color: colors.textSub, fontWeight: "500" },
   horizontalListPadding: { paddingHorizontal: 24 },
+  skeletonCard: {
+    width: 200,
+    marginRight: 16,
+    borderRadius: 16,
+    overflow: "hidden",
+    backgroundColor: colors.white,
+  },
+  skeletonImage: {
+    borderTopLeftRadius: 16,
+    borderTopRightRadius: 16,
+    borderBottomLeftRadius: 0,
+    borderBottomRightRadius: 0,
+  },
+  skeletonTextBox: { padding: 16 },
 
   // Card Styles
   card: {

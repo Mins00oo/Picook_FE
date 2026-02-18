@@ -12,14 +12,14 @@ export default function HomeHeader({ nickname }) {
             <Text style={styles.highlightText}>든든한 계란말이</Text> 어때요?
           </Text>
         </View>
-        <TouchableOpacity style={styles.notifButton}>
+        {/* <TouchableOpacity style={styles.notifButton}>
           <Ionicons
             name="notifications-outline"
             size={24}
             color={colors.white}
           />
           <View style={styles.badge} />
-        </TouchableOpacity>
+        </TouchableOpacity> */}
       </View>
     </View>
   );

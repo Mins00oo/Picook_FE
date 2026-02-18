@@ -1,6 +1,6 @@
-import React from "react";
 import { SafeAreaProvider } from "react-native-safe-area-context";
 import { StatusBar } from "expo-status-bar";
+import Toast from "react-native-toast-message";
 import AppNavigator from "./src/navigation/AppNavigator";
 
 export default function App() {
@@ -12,6 +12,7 @@ export default function App() {
 
       {/* 3. 우리가 만든 네비게이션(앱의 본체) 연결 */}
       <AppNavigator />
+      <Toast />
     </SafeAreaProvider>
   );
 }
