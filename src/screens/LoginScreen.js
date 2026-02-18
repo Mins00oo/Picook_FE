@@ -1,4 +1,4 @@
-import { View, Text, StyleSheet, ActivityIndicator } from "react-native";
+import { View, Text, StyleSheet, ActivityIndicator, Alert } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import SocialButton from "../components/SocialButton";
 import { useAuthStore } from "../store/useAuthStore";
@@ -11,7 +11,16 @@ export default function LoginScreen() {
 
   const handleLogin = async (provider) => {
     // 실제 로그인 로직 실행 (상태가 변하면 AppNavigator가 알아서 화면 전환)
-    await login(provider);
+    try {
+      await login(provider);
+    } catch (error) {
+      Alert.alert(
+        "로그인 실패",
+        provider === "Kakao"
+          ? "카카오 로그인에 실패했어요. 카카오 개발자 콘솔 설정과 앱 키를 확인해주세요."
+          : "로그인에 실패했어요. 잠시 후 다시 시도해주세요.",
+      );
+    }
   };
 
   return (

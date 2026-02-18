@@ -5,28 +5,34 @@
     "scheme": "picook",
     "version": "1.0.0",
     "orientation": "portrait",
-    "icon": "./assets/icon.png",
+    "icon": "./assets/branding/app-icon.png",
     "userInterfaceStyle": "light",
     "newArchEnabled": true,
     "splash": {
-      "image": "./assets/splash-icon.png",
+      "image": "./assets/branding/splash-logo.png",
       "resizeMode": "contain",
-      "backgroundColor": "#ffffff"
+      "backgroundColor": "#dbe8d4"
     },
     "ios": {
       "supportsTablet": true,
-      "bundleIdentifier": "com.picook.app"
+      "bundleIdentifier": "com.picook.app",
+      "icon": "./assets/branding/app-icon-ios.png",
+      "infoPlist": {
+        "ITSAppUsesNonExemptEncryption": false
+      }
     },
-    "android": {
-      "package": "com.picook.app",
-      "adaptiveIcon": {
-        "foregroundImage": "./assets/adaptive-icon.png",
-        "backgroundColor": "#ffffff"
-      },
-      "edgeToEdgeEnabled": true
-    },
-    "web": {
-      "favicon": "./assets/favicon.png"
+    "plugins": [
+      [
+        "@react-native-seoul/kakao-login",
+        {
+          "kakaoAppKey": "6acd28308e258039a2cb24c7b4b6a0a7"
+        }
+      ]
+    ],
+    "extra": {
+      "eas": {
+        "projectId": "2bb7aa5f-b7f4-4cd1-8200-b103f51cf1ce"
+      }
     }
   }
 }
