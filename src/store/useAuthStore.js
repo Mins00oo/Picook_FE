@@ -196,5 +196,5 @@ export const useAuthStore = create(
 );
 
 setAccessTokenGetter(() => useAuthStore.getState().accessToken);
-setRefreshSessionGetter(() => useAuthStore.getState().refreshSession());  // ()로 호출까지 실행
-setLogoutGetter(() => useAuthStore.getState().logout());                 // ()로 호출까지 실행
+setRefreshSessionGetter(() => useAuthStore.getState().refreshSession()); // ()로 호출까지 실행
+setLogoutGetter(() => useAuthStore.getState().logout()); // ()로 호출까지 실행

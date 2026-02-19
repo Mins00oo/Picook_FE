@@ -71,7 +71,7 @@ export default function MyPageScreen() {
 
   const displayProfile = profile ?? user;
   const nickname = displayProfile?.nickname ?? "사용자";
-  const email = displayProfile?.email ?? "로그인 정보 없음";
+  const email = displayProfile?.email ?? "이메일 정보 없음";
   const profileImage = displayProfile?.profileImage;
 
   return (
