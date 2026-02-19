@@ -1,12 +1,58 @@
-import { View, Text, StyleSheet, TouchableOpacity, Alert } from "react-native";
+import { useEffect, useState } from "react";
+import {
+  View,
+  Text,
+  Image,
+  StyleSheet,
+  TouchableOpacity,
+  Alert,
+  ActivityIndicator,
+} from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { Ionicons } from "@expo/vector-icons";
 import { colors } from "../theme/colors";
-import { useAuthStore } from "../store/useAuthStore"; // 스토어 불러오기
+import { useAuthStore } from "../store/useAuthStore";
+import { getMyProfile } from "../api/userApi";
 
 export default function MyPageScreen() {
   const user = useAuthStore((state) => state.user);
   const logout = useAuthStore((state) => state.logout);
+
+  const [profile, setProfile] = useState(null);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
+
+  useEffect(() => {
+    let cancelled = false;
+    (async () => {
+      setLoading(true);
+      setError(null);
+      try {
+        const data = await getMyProfile();
+        if (!cancelled) {
+          setProfile(data);
+        }
+      } catch (e) {
+        if (cancelled) {
+          return;
+        }
+        // e: AxiosError(4xx/5xx) → message는 e.response?.data?.message
+        //    ApiError(getApiData에서 throw) → message는 e.message
+        const message =
+          e.response?.data?.message ??
+          e.message ??
+          "내 정보를 불러오지 못했습니다.";
+        setError({ message });
+      } finally {
+        if (!cancelled) {
+          setLoading(false);
+        }
+      }
+    })();
+    return () => {
+      cancelled = true;
+    };
+  }, []);
 
   const handleLogout = () => {
     Alert.alert("로그아웃", "정말 로그아웃 하시겠습니까?", [
@@ -23,6 +69,11 @@ export default function MyPageScreen() {
     ]);
   };
 
+  const displayProfile = profile ?? user;
+  const nickname = displayProfile?.nickname ?? "사용자";
+  const email = displayProfile?.email ?? "로그인 정보 없음";
+  const profileImage = displayProfile?.profileImage;
+
   return (
     <SafeAreaView style={styles.container}>
       <View style={styles.header}>
@@ -32,15 +83,32 @@ export default function MyPageScreen() {
       <View style={styles.content}>
         {/* 프로필 섹션 */}
         <View style={styles.profileCard}>
-          <View style={styles.avatar}>
-            <Ionicons name="person" size={40} color={colors.textSub} />
-          </View>
-          <View style={styles.profileInfo}>
-            <Text style={styles.nickname}>{user?.nickname || "사용자"}님</Text>
-            <Text style={styles.email}>
-              {user?.email || "로그인 정보 없음"}
-            </Text>
-          </View>
+          {loading ? (
+            <View style={styles.profileLoading}>
+              <ActivityIndicator size="large" color={colors.primary} />
+            </View>
+          ) : error ? (
+            <View style={styles.profileInfo}>
+              <Text style={styles.errorText}>{error.message}</Text>
+            </View>
+          ) : (
+            <>
+              <View style={styles.avatar}>
+                {profileImage ? (
+                  <Image
+                    source={{ uri: profileImage }}
+                    style={styles.avatarImage}
+                  />
+                ) : (
+                  <Ionicons name="person" size={40} color={colors.textSub} />
+                )}
+              </View>
+              <View style={styles.profileInfo}>
+                <Text style={styles.nickname}>{nickname}님</Text>
+                <Text style={styles.email}>{email}</Text>
+              </View>
+            </>
+          )}
         </View>
 
         {/* 메뉴 리스트 */}
@@ -97,10 +165,19 @@ const styles = StyleSheet.create({
     justifyContent: "center",
     alignItems: "center",
     marginRight: 16,
+    overflow: "hidden",
+  },
+  avatarImage: { width: 60, height: 60 },
+  profileLoading: {
+    flex: 1,
+    paddingVertical: 20,
+    alignItems: "center",
+    justifyContent: "center",
   },
   profileInfo: { flex: 1 },
   nickname: { fontSize: 18, fontWeight: "bold", color: colors.textMain },
   email: { fontSize: 14, color: colors.textSub, marginTop: 4 },
+  errorText: { fontSize: 14, color: colors.textSub },
 
   // 메뉴
   menuContainer: { marginBottom: 30 },

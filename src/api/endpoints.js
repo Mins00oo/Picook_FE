@@ -7,3 +7,7 @@ export const AUTH = {
   REFRESH: "/api/auth/refresh",
   LOGOUT: "/api/auth/logout",
 };
+
+export const USERS = {
+  ME: "/api/users/me",
+};

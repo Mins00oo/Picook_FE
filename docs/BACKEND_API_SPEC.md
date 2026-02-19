@@ -125,14 +125,79 @@
 
 ---
 
-## 4. 인증이 필요한 API
+## 4. 공통 응답 형식 (ApiResponse)
 
-- 모든 비인증 API 외의 요청에는 `Authorization: Bearer <accessToken>` 헤더를 붙여 전송
+성공/실패 공통 래퍼. **실제 데이터는 `data` 필드**에 담습니다.
+
+**성공 예시**
+```json
+{
+  "success": true,
+  "code": "S000",
+  "data": { ... },
+  "message": "요청이 성공적으로 처리되었습니다.",
+  "timestamp": "2026-02-19T10:20:30.123Z",
+  "errors": null
+}
+```
+
+**실패 예시**
+```json
+{
+  "success": false,
+  "code": "U005",
+  "data": null,
+  "message": "액세스 토큰이 유효하지 않습니다.",
+  "timestamp": "2026-02-19T10:20:30.123Z",
+  "errors": null
+}
+```
+
+프론트는 `response.data.data`를 사용하며, 4xx/5xx 시 `response.data.code`, `response.data.message`로 처리합니다.
+
+---
+
+## 5. 인증이 필요한 API
+
+### 5.1 내 정보 조회 (마이페이지)
+
+| 항목 | 값 |
+|------|-----|
+| Method | `GET` |
+| Path | `/api/users/me` |
+| Authorization | `Bearer <accessToken>` 필수 |
+
+**Response (200 OK, ApiResponse 래퍼)**
+```json
+{
+  "success": true,
+  "code": "S000",
+  "data": {
+    "id": 1,
+    "nickname": "picook-user",
+    "email": "user@kakao.com",
+    "profileImage": "https://..."
+  },
+  "message": "요청이 성공적으로 처리되었습니다.",
+  "timestamp": "2026-02-19T10:20:30.123Z",
+  "errors": null
+}
+```
+
+**에러**
+- 401 (U005): 액세스 토큰 유효하지 않음 → 프론트에서 refresh/로그아웃 처리
+- 404 (U006): 존재하지 않는 사용자 → `message`: "존재하지 않는 사용자입니다."
+
+---
+
+## 6. 인증이 필요한 API (공통)
+
+- 위를 제외한 인증 필요 API에도 `Authorization: Bearer <accessToken>` 헤더를 붙여 전송
 - 프론트는 토큰이 있으면 자동으로 모든 요청에 헤더 주입
 
 ---
 
-## 5. 에러 응답
+## 7. 에러 응답
 
 | 상태 코드 | 의미 | 프론트 동작 |
 |-----------|------|-------------|
@@ -142,7 +207,7 @@
 
 ---
 
-## 6. 환경 설정
+## 8. 환경 설정
 
 | 항목 | 값 |
 |------|-----|
@@ -151,12 +216,13 @@
 
 ---
 
-## 7. 정리
+## 9. 정리
 
 백엔드에서 구현해야 할 API는 다음과 같습니다.
 
 1. **POST /api/auth/kakao/mobile** – 카카오 토큰 검증 후 JWT 발급
 2. **POST /api/auth/refresh** – refresh 토큰으로 새 access/refresh 발급
 3. **POST /api/auth/logout** – refresh 토큰 폐기
+4. **GET /api/users/me** – 내 정보 조회 (ApiResponse 래퍼, 401/404 처리)
 
-추가 API는 `Authorization: Bearer <accessToken>` 형식의 헤더를 받아 검증하면 됩니다.
+추가 API는 `Authorization: Bearer <accessToken>` + ApiResponse 형식을 사용하면 됩니다.

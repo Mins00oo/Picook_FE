@@ -44,8 +44,11 @@ let failedQueue = [];
 
 const processQueue = (error, token = null) => {
   failedQueue.forEach(({ resolve, reject }) => {
-    if (error) reject(error);
-    else resolve(token);
+    if (error) {
+      reject(error);
+    } else {
+      resolve(token);
+    }
   });
   failedQueue = [];
 };

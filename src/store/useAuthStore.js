@@ -101,7 +101,9 @@ export const useAuthStore = create(
       // 앱 재실행 후 필요 시 호출: refresh token으로 세션 복구
       refreshSession: async () => {
         const refreshToken = get().refreshToken;
-        if (!refreshToken) return false;
+        if (!refreshToken) {
+          return false;
+        }
 
         try {
           const response = await api.post(AUTH.REFRESH, {
