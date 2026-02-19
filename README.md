@@ -82,11 +82,10 @@ npm install
 
 ### 3. 환경 변수 설정 (.env)
 
-프로젝트 루트에 .env 파일을 생성하고 아래 내용을 추가하세요.
-(현재는 데모 단계이므로 값은 임의로 넣어도 동작합니다.)
+프로젝트 루트에 `.env` 파일을 생성하고 아래 내용을 추가하세요.
 
 ```plain text
-EXPO_PUBLIC_API_URL=http://localhost:8080 // 로컬 백엔드 API 경로
+EXPO_PUBLIC_API_URL=http://localhost:8080
 EXPO_PUBLIC_KAKAO_APP_KEY=your_kakao_key
 ```
 

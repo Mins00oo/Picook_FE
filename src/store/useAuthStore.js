@@ -1,23 +1,18 @@
-import axios from "axios";
 import { create } from "zustand";
 import { createJSONStorage, persist } from "zustand/middleware";
 import AsyncStorage from "@react-native-async-storage/async-storage";
+import api, {
+  setAccessTokenGetter,
+  setRefreshSessionGetter,
+  setLogoutGetter,
+} from "../api/client";
+import { AUTH } from "../api/endpoints";
 import {
   getProfile as getKakaoProfile,
   login as loginWithKakao,
   logout as logoutKakao,
   unlink as unlinkKakao,
 } from "@react-native-seoul/kakao-login";
-
-// TODO: 개발/운영 환경별로 EAS 환경변수(EXPO_PUBLIC_API_BASE_URL)를 분리하세요.
-// 예) development: http://192.168.x.x:8080, production: https://api.your-domain.com
-const API_BASE_URL =
-  process.env.EXPO_PUBLIC_API_BASE_URL || "http://localhost:8080";
-
-const api = axios.create({
-  baseURL: API_BASE_URL,
-  timeout: 10000,
-});
 
 /*
   [Auth Store - Backend JWT 구조]
@@ -68,7 +63,7 @@ export const useAuthStore = create(
           const kakaoProfile = await getKakaoProfile();
 
           // 백엔드 토큰 교환 엔드포인트
-          const response = await api.post("/api/auth/kakao/mobile", {
+          const response = await api.post(AUTH.KAKAO_MOBILE, {
             accessToken: kakaoToken.accessToken,
           });
 
@@ -109,7 +104,7 @@ export const useAuthStore = create(
         if (!refreshToken) return false;
 
         try {
-          const response = await api.post("/api/auth/refresh", {
+          const response = await api.post(AUTH.REFRESH, {
             refreshToken,
           });
           const data = response.data || {};
@@ -153,21 +148,13 @@ export const useAuthStore = create(
       },
 
       logout: async () => {
-        const { authProvider, refreshToken, accessToken } = get();
+        const { authProvider, refreshToken } = get();
 
         // 백엔드 로그아웃(리프레시 토큰 폐기)
         // 엔드포인트: POST /api/auth/logout
         try {
           if (refreshToken) {
-            await api.post(
-              "/api/auth/logout",
-              { refreshToken },
-              {
-                headers: accessToken
-                  ? { Authorization: `Bearer ${accessToken}` }
-                  : undefined,
-              },
-            );
+            await api.post(AUTH.LOGOUT, { refreshToken });
           }
         } catch (error) {
           // 서버 로그아웃 실패해도 로컬 세션 정리는 진행
@@ -205,3 +192,7 @@ export const useAuthStore = create(
     },
   ),
 );
+
+setAccessTokenGetter(() => useAuthStore.getState().accessToken);
+setRefreshSessionGetter(() => useAuthStore.getState().refreshSession());  // ()로 호출까지 실행
+setLogoutGetter(() => useAuthStore.getState().logout());                 // ()로 호출까지 실행
